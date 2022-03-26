@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  web:
+    tty: true
+    stdin_open: true
+    build: .
+    command: bash -c "scripts/entrypoint.sh"
+    env_file:
+      - ./dev.env
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    links:
+      - db
+      - redis
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+
+  redis:
+    image: 'redis:5-alpine'
+    command: redis-server --port 6380
+    ports:
+      - '6380:6380'
+    volumes:
+      - 'redis:/data'
+
+volumes:
+  redis:
+  db:
+
+  
